@@ -21,19 +21,7 @@ export class FilmsInMemoryRepository implements FilmsRepository {
   }
 
   async findOne(id: string): Promise<FilmWithScheduleDto | undefined> {
-    const film = this.films.find((item) => item.id === id);
-
-    if (!film) {
-      return undefined;
-    }
-
-    return {
-      ...film,
-      schedule: film.schedule.map((session) => ({
-        ...session,
-        hall: String(session.hall),
-      })),
-    };
+    return this.films.find((film) => film.id === id);
   }
 
   async bookSeat(
