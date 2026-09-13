@@ -1,0 +1,79 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    image: ghcr.io/axeliriya/film-frontend:latest
+    volumes:
+      - frontend_dist:/app/dist
+    command: npm run build
+    networks:
+      - film-network
+
+  backend:
+    build:
+      context: ./backend
+    image: ghcr.io/axeliriya/film-backend:latest
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    networks:
+      - film-network
+
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d films']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - film-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - .env.docker
+    ports:
+      - '8080:80'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - film-network
+
+  nginx:
+    build:
+      context: ./nginx
+    image: ghcr.io/axeliriya/film-nginx:latest
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_completed_successfully
+      backend:
+        condition: service_started
+    ports:
+      - '80:80'
+    volumes:
+      - frontend_dist:/usr/share/nginx/html:ro
+    networks:
+      - film-network
+
+volumes:
+  frontend_dist:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  film-network:
+    driver: bridge
