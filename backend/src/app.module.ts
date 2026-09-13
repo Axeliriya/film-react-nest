@@ -45,8 +45,8 @@ import { FilmsPostgresRepository } from './repository/films.postgres.repository'
           database: databaseUrl.pathname.slice(1),
           username: configService.getOrThrow<string>('DATABASE_USERNAME'),
           password: configService.getOrThrow<string>('DATABASE_PASSWORD'),
-          entities: [FilmEntity, ScheduleEntity],
-          synchronize: false,
+          entities: [path.join(__dirname, '**', '*.entity{.ts,.js}')],
+          synchronize: configService.get<string>('NODE_ENV') !== 'production',
         };
       },
     }),
