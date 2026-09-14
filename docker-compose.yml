@@ -3,9 +3,9 @@ services:
     build:
       context: ./frontend
     image: ghcr.io/axeliriya/film-frontend:latest
+    restart: 'no'
     volumes:
       - frontend_dist:/app/dist
-    command: npm run build
     networks:
       - film-network
 
