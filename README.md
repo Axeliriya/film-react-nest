@@ -1,5 +1,11 @@
 # FILM!
 
+## Деплой
+
+Приложение доступно по адресу:
+
+[axeliriya-film.nomorepartiessite.ru](http://axeliriya-film.nomorepartiessite.ru)
+
 ## Установка
 
 ### PostgreSQL
