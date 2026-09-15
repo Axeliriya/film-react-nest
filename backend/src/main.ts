@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import 'dotenv/config';
+import { ConfigService } from '@nestjs/config';
 
 import { DevLogger } from './logger/dev.logger';
 import { JsonLogger } from './logger/json.logger';
@@ -12,6 +12,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+
+  const configService = app.get(ConfigService);
+  const loggerType = configService.get<string>('LOGGER', 'dev');
 
   app.use(
     helmet({
@@ -31,8 +34,6 @@ async function bootstrap() {
     }),
   );
 
-  const loggerType = process.env.LOGGER;
-
   switch (loggerType) {
     case 'json':
       app.useLogger(new JsonLogger());
@@ -48,7 +49,9 @@ async function bootstrap() {
       break;
   }
 
-  await app.listen(3000);
+  const port = configService.get<number>('PORT', 3000);
+
+  await app.listen(port);
 }
 
 bootstrap();

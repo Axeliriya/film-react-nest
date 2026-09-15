@@ -29,6 +29,9 @@ services:
       - .env.docker
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./backend/test/prac.init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./backend/test/prac.films.sql:/docker-entrypoint-initdb.d/02-films.sql:ro
+      - ./backend/test/prac.shedules.sql:/docker-entrypoint-initdb.d/03-shedules.sql:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres -d films']
       interval: 5s

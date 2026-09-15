@@ -59,7 +59,7 @@ describe('FilmsController', () => {
 
   describe('findOne', () => {
     it('should return film schedule by id from FilmsService', async () => {
-      const filmId = 'film-1';
+      const filmId = '92b8a2a7-ab6b-4fa9-915b-d27945865e39';
 
       const expectedResult = {
         total: 1,
