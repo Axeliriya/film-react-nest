@@ -1,24 +1,61 @@
 # FILM!
 
+## Деплой
+
+Приложение доступно по адресу:
+
+[axeliriya-film.nomorepartiessite.ru](http://axeliriya-film.nomorepartiessite.ru)
+
 ## Установка
 
 ### PostgreSQL
 
-Установите PostgreSQL скачав дистрибутив с официального сайта или используйте Docker.
+Для локального запуска базы данных используется Docker Compose.
 
-Заполните необходимые параметры БД и пользователя в файле `docker-compose.yml` и запустите контейнер.
+Создайте файл `.env.docker` на основе корневого `.env.example`:
 
-```
-docker-compose up -d
+```bash
+cp .env.example .env.docker
 ```
 
-Восстановите тестовые данные из дампов, выполнив команды из корня проекта:
+При необходимости измените значения переменных окружения в `.env.docker`.
 
+Запустите приложение из корня проекта:
+
+```bash
+docker compose up -d --build
 ```
-docker exec -i postgres_container psql -U postgres -d films < backend/test/prac.init.sql
-docker exec -i postgres_container psql -U postgres -d films < backend/test/prac.films.sql
-docker exec -i postgres_container psql -U postgres -d films < backend/test/prac.shedules.sql
+
+При первом запуске PostgreSQL автоматически создаёт таблицы и загружает тестовые данные из файлов:
+
+- `backend/test/prac.init.sql`
+- `backend/test/prac.films.sql`
+- `backend/test/prac.shedules.sql`
+
+Приложение будет доступно по адресу:
+
+```text
+http://localhost
 ```
+
+pgAdmin будет доступен по адресу:
+
+```text
+http://localhost:8080
+```
+
+### Повторная инициализация базы данных
+
+SQL-скрипты выполняются только при создании пустого тома PostgreSQL.
+
+Чтобы полностью пересоздать локальную базу данных:
+
+```bash
+docker compose down -v
+docker compose up -d --build
+```
+
+Важно: команда `docker compose down -v` удаляет данные локальной базы PostgreSQL.
 
 ### Бэкенд
 
@@ -32,10 +69,12 @@ docker exec -i postgres_container psql -U postgres -d films < backend/test/prac.
 
 Создайте `.env` файл из примера `.env.example`, в нём укажите:
 
-- `DATABASE_DRIVER` - тип драйвера СУБД - в нашем случае это `postgres`
-- `DATABASE_URL` - адрес СУБД PostgreSQL, например `postgres://127.0.0.1:5432/films`
-- `DATABASE_USERNAME` - имя пользователя БД
-- `DATABASE_PASSWORD` - пароль пользователя БД
+- `DATABASE_DRIVER` — тип драйвера СУБД, в данном проекте `postgres`
+- `DATABASE_URL` — адрес PostgreSQL, например `postgres://127.0.0.1:5432/films`
+- `DATABASE_USERNAME` — имя пользователя БД
+- `DATABASE_PASSWORD` — пароль пользователя БД
+- `LOGGER` — формат логирования
+- `PORT` — порт бэкенда, по умолчанию `3000`
 
 PostgreSQL должна быть установлена и запущена.
 
@@ -44,6 +83,12 @@ PostgreSQL должна быть установлена и запущена.
 `npm run start:debug`
 
 Для проверки отправьте тестовый запрос с помощью Postman или `curl`.
+
+По умолчанию API будет доступен по адресу:
+
+```text
+http://localhost:3000/api/afisha
+```
 
 ### Фронтенд
 
@@ -55,11 +100,13 @@ PostgreSQL должна быть установлена и запущена.
 
 `npm i`
 
-Создайте `.env` файл из примера `.env.example` и укажите адрес локального бэкенда:
+Создайте `.env` файл из примера `.env.example`.
+
+Переменные окружения:
 
 ```
-VITE_API_URL=http://localhost:3000/api/afisha
-VITE_CDN_URL=http://localhost:3000/content/afisha
+VITE_API_URL=/api/afisha
+VITE_CDN_URL=/content/afisha
 ```
 
 Запустите фронтенд в режиме разработки:
@@ -67,3 +114,7 @@ VITE_CDN_URL=http://localhost:3000/content/afisha
 `npm run dev`
 
 Приложение откроется по адресу `http://localhost:5173`.
+
+```
+
+```
